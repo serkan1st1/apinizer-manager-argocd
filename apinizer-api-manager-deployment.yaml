@@ -43,36 +43,6 @@ spec:
           limits:
             cpu: 1
             memory: 3Gi
-        startupProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /apinizer/management/health
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 30
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /apinizer/management/health
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 30
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /apinizer/management/health
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 30
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       hostAliases:
