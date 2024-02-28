@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: manager
+  namespace: apinizer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: manager
+      version: v1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: manager
+        version: v1
+    spec:
+      containers:
+      - env:
+        - name: JAVA_OPTS
+          value: ' -Xmx2048m -Xms2048m -Dlog4j.formatMsgNoLookups=true'
+        - name: SPRING_PROFILES_ACTIVE
+          value: prod
+        - name: SPRING_DATA_MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              key: dbUrl
+              name: mongo-db-credentials
+        - name: SPRING_DATA_MONGODB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              key: dbName
+              name: mongo-db-credentials
+        name: manager
+        image: apinizercloud/manager:2024.01.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 1
+            memory: 3Gi
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /apinizer/management/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 30
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /apinizer/management/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 30
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /apinizer/management/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 30
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      hostAliases:
+      - ip: "172.16.100.183"
+        hostnames:
+        - "apinizer"
